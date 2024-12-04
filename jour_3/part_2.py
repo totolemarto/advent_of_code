@@ -1,5 +1,9 @@
 #!/bin/python3
-with open("star1","r") as f:
+from sys import argv
+if len(argv) != 2 :
+    print(f"usage : {argv[0]} <fichier>")
+    exit(1)
+with open(argv[1],"r") as f:
     x = f.read()
 
 def reboot():
@@ -15,7 +19,6 @@ a = b = None
 tot = 0
 flag = 0
 for elem in x:
-    print(elem, end = "")
     if cur == 0: 
         if elem == "m" and not flag:
             cur = 1
@@ -78,7 +81,6 @@ for elem in x:
         reboot()
         continue
     if cur == 7:
-        print("dans 7 :", elem)
         if elem == "(":
             cur = 8
             continue
@@ -95,7 +97,6 @@ for elem in x:
         reboot()
         continue
     if cur == 9:
-        print("dans 9 :", elem)
         if elem == "'":
             cur = 10
             continue
@@ -120,5 +121,4 @@ for elem in x:
             continue
         reboot()
         continue
-    print(flag)
 print(tot)
