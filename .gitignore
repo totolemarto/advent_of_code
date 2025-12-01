@@ -1,1 +1,3 @@
 star1
+**/target/
+**/Cargo.lock
