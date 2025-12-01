@@ -1,7 +1,7 @@
 use std::env;
 use std::fs;
 
-fn main() {
+fn init() -> (String, String) {
     let args: Vec<String> = env::args().collect();
     if args.len() != 3{
         println!("usage <file to read> < step for stars>");
@@ -12,6 +12,12 @@ fn main() {
     let mode = &args[2];
     let content = fs::read_to_string(file_name)
         .expect("Error while reading file");
+
+    (content, mode.clone())
+}
+
+fn main() {
+    let (content, mode) = init();
 
     let mut current : i32 = 50;
     let mut result : i32 = 0;
