@@ -17,6 +17,29 @@ fn init() -> (String, String) {
     (content, mode.clone())
 }
 
+fn first_star(i : i128) -> i128{
+    let str_repr = i.to_string();
+    if str_repr.len() % 2 != 0{
+        return 0;
+    }
+    let two_parts = str_repr.split_at(str_repr.len() / 2);
+    if two_parts.0.eq(two_parts.1){
+        return i;
+    }
+    return 0;
+}
+
+fn second_star(i : i128) -> i128{
+    let str_repr = i.to_string();
+    for j in 0..str_repr.len() / 2 + 1{
+        let current_sub_string = str_repr.split_at(j);
+        if str_repr.matches(current_sub_string.0).count() * current_sub_string.0.len() == str_repr.len(){
+            return i;
+        }
+    }
+    return 0;
+}
+
 fn main() {
     let (content, mode) = init();
 
@@ -24,28 +47,19 @@ fn main() {
     let split_value = content.split(",");
 
     for value in split_value{
-        println!("value = {} ", value);
         if value.len() < 1{
             break;
         }
         let mut bornes = value.split("-");
         let inf_borne = bornes.next().unwrap().parse::<i128>().unwrap();
         let sup_borne = bornes.next().unwrap().parse::<i128>().unwrap();
-        println!("inf = {} sup = {}", inf_borne, sup_borne);
         for i in inf_borne..sup_borne + 1{
-            let str_repr = i.to_string();
-            if str_repr.len() % 2 != 0{
-                continue;
-            }
-            let first_part = str_repr.split_at(str_repr.len() / 2);
-            if first_part.0.eq(first_part.1){
-                result += i;
+            if mode.eq("1"){
+                result += first_star(i);
+            } else {
+                result += second_star(i);
             }
         }
-        if mode.eq("2"){
-            println!("coucou");
-        }
-
     }
     println!("{result} ");
 }
