@@ -31,9 +31,10 @@ fn first_star(i : i128) -> i128{
 
 fn second_star(i : i128) -> i128{
     let str_repr = i.to_string();
-    for j in 0..str_repr.len() / 2 + 1{
+    let total_len = str_repr.len();
+    for j in 1..str_repr.len() / 2 + 1{
         let current_sub_string = str_repr.split_at(j);
-        if str_repr.matches(current_sub_string.0).count() * current_sub_string.0.len() == str_repr.len(){
+        if str_repr.matches(current_sub_string.0).count() * j == total_len{
             return i;
         }
     }
@@ -47,9 +48,6 @@ fn main() {
     let split_value = content.split(",");
 
     for value in split_value{
-        if value.len() < 1{
-            break;
-        }
         let mut bornes = value.split("-");
         let inf_borne = bornes.next().unwrap().parse::<i128>().unwrap();
         let sup_borne = bornes.next().unwrap().parse::<i128>().unwrap();
