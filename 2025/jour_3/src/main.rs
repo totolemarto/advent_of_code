@@ -1,6 +1,10 @@
 use std::cmp::max;
+use std::cmp::min;
 use std::env;
 use std::fs;
+use std::cell::RefCell;
+
+thread_local!(static DEBUG: RefCell<bool> = RefCell::new(true));
 
 fn init() -> (String, String) {
     let args: Vec<String> = env::args().collect();
@@ -47,15 +51,43 @@ fn first_star(value : &str) -> i128{
 }
 
 fn second_star(value : &str) -> i128{
-    // let str_repr = i.to_string();
-    // let total_len = str_repr.len();
-    // for j in 1..str_repr.len() / 2 + 1{
-    //     let current_sub_string = str_repr.split_at(j);
-    //     if str_repr.matches(current_sub_string.0).count() * j == total_len{
-    //         return i;
-    //     }
-    // }
-    return 0;
+    let mut vector : Vec<i128> = Vec::new();
+    let mut current_char = 0;
+    let mut pos_last_char_used = 0;
+    while current_char != 12{
+        let begin_word = value.split_at(min(value.len() - 12 + pos_last_char_used + 1, value.len()));
+        let interesting_part = begin_word.0.split_at(pos_last_char_used).1;
+        let mut maxi = 0;
+        let mut cur_index = pos_last_char_used;
+
+        if value.len() - cur_index <= 12 - current_char {
+            for new_char in value.split_at(cur_index).1.chars(){
+                vector.push(i128::from(new_char.to_digit(10).unwrap()));
+            }
+            break;
+        }
+
+        for elem in interesting_part.chars(){
+            let tmp = i128::from(elem.to_digit(10).unwrap());
+            if tmp > maxi{
+                maxi = tmp;
+                pos_last_char_used = cur_index + 1;
+            }
+            if value.len() - cur_index <= 12 - current_char {
+                break;
+            }
+            cur_index += 1;
+        }
+
+        vector.push(maxi);
+        current_char += 1;
+    }
+    let mut result : i128 = 0;
+    for elem in vector{
+        result *= 10;
+        result += elem; 
+    }
+    return result;
 }
 
 fn main() {
@@ -68,7 +100,7 @@ fn main() {
         if mode.eq("1"){
             result += first_star(value);
         } else {
-            // result += second_star(value);
+            result += second_star(value);
         }
     }
     println!("{result} ");
