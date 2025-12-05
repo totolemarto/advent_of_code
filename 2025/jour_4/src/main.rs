@@ -82,45 +82,43 @@ fn first_star(matrix : Matrix) -> i128{
     return result;
 }
 
-// fn second_star(value : &str) -> i128{
-//     let mut vector : Vec<i128> = Vec::new();
-//     let mut current_char = 0;
-//     let mut pos_last_char_used = 0;
-//     while current_char != 12{
-//         let begin_word = value.split_at(min(value.len() - 12 + pos_last_char_used + 1, value.len()));
-//         let interesting_part = begin_word.0.split_at(pos_last_char_used).1;
-//         let mut maxi = 0;
-//         let mut cur_index = pos_last_char_used;
-//
-//         if value.len() - cur_index <= 12 - current_char {
-//             for new_char in value.split_at(cur_index).1.chars(){
-//                 vector.push(i128::from(new_char.to_digit(10).unwrap()));
-//             }
-//             break;
-//         }
-//
-//         for elem in interesting_part.chars(){
-//             let tmp = i128::from(elem.to_digit(10).unwrap());
-//             if tmp > maxi{
-//                 maxi = tmp;
-//                 pos_last_char_used = cur_index + 1;
-//             }
-//             if value.len() - cur_index <= 12 - current_char {
-//                 break;
-//             }
-//             cur_index += 1;
-//         }
-//
-//         vector.push(maxi);
-//         current_char += 1;
-//     }
-//     let mut result : i128 = 0;
-//     for elem in vector{
-//         result *= 10;
-//         result += elem; 
-//     }
-//     return result;
-// }
+fn second_star(mut matrix : Matrix) -> i128{
+    let mut data = vec![vec!['.'; matrix.cols]; matrix.rows];
+
+
+    let mut result = 0;
+    let mut prev_value = 1;
+    let mut current_value;
+    while result != prev_value {
+        current_value = 0;
+        for i in 0..matrix.clone().rows{
+            for j in 0..matrix.clone().cols{
+                if matrix.data[i][j] != 1{
+                    continue;
+                }
+                let tmp = if is_accessible(&matrix, i, j) {1} else {0};
+                data[i][j] = if matrix.data[i][j] == 1 && tmp == 1 {'x'} else if matrix.data[i][j] == 1 {'@'} else {'.'};
+                current_value += tmp;
+                assert_eq!(tmp == 1, data[i][j] == 'x');
+            }
+        }
+        for i in 0..matrix.clone().rows{
+            for j in 0..matrix.clone().cols{
+                if data[i][j] == 'x'{
+                    matrix.data[i][j] = 0;
+                    data[i][j] = '.';
+                }
+            }
+        }
+        prev_value = result;
+        result += current_value;
+    }
+    // for line in data.clone(){
+    //     println!("{:?}", line);
+    // }
+    // println!("{} ", result);
+    return result;
+}
 
 fn main() {
     let (content, mode) = init();
@@ -145,7 +143,7 @@ fn main() {
     if mode.eq("1"){
         result = first_star(matrix);
     } else {
-        // result += second_star(matrix);
+        result += second_star(matrix);
     }
     println!("{result} ");
 }
