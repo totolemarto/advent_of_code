@@ -20,6 +20,9 @@ fn init() -> (String, String) {
     content.pop(); // remove 0x0a from content
     (content, mode.clone())
 }
+
+
+
 /*
  * bounds                |                           |
  *
@@ -87,6 +90,7 @@ fn main() {
             let begin = two_values.next().unwrap().parse::<i128>().unwrap();
             let end = two_values.next().unwrap().parse::<i128>().unwrap();
             let mut tmp = 0;
+
             if mode.eq("2"){
                 tmp = second_part(begin, end, &vec_range);
             }
@@ -100,6 +104,5 @@ fn main() {
             result += first_part(current, vec_range.iter());
         }
     }
-    println!("{result} ");
+    println!("resultat = {}", result);
 }
-// 367425856150254 -> too hight
