@@ -1,15 +1,9 @@
-use std::collections::HashMap;
+use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::cell::RefCell;
 
 thread_local!(static DEBUG: RefCell<bool> = RefCell::new(true));
-
-#[derive(Debug, Clone, Copy)]
-struct Tile{
-    line : i128,
-    column : i128,
-}
 
 fn init() -> (String, String) {
     let args: Vec<String> = env::args().collect();
@@ -27,9 +21,41 @@ fn init() -> (String, String) {
     (content, mode.clone())
 }
 
+
+#[derive(Debug, Clone, Copy)]
+struct Tile{
+    line : i128,
+    column : i128,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
+struct Rectangle{
+    corner_1 : Tile,
+    corner_2 : Tile,
+    area : i128,
+}
+impl Eq for Rectangle{
+}
+impl PartialEq for Rectangle{
+    fn eq(&self, other : &Self) -> bool{
+        return self.area == other.area;
+    }
+}
+
+impl Ord for Rectangle {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.area.cmp(&self.area)
+    }
+}
+
+impl PartialOrd for Rectangle{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(other.area.cmp(&self.area))
+    }
+}
 fn create_tile(matrix: & Vec<String>) -> Vec<Tile> {
     let mut result : Vec<Tile> = Vec::new();
-    let mut i = 0;
     for line in matrix{
         if line.eq(""){
             continue;
@@ -38,7 +64,6 @@ fn create_tile(matrix: & Vec<String>) -> Vec<Tile> {
         let x = values.next().unwrap().parse::<i128>().unwrap();
         let y = values.next().unwrap().parse::<i128>().unwrap();
         result.push(Tile{line : y, column : x});
-        i += 1;
     }
     return result;
 
@@ -46,35 +71,7 @@ fn create_tile(matrix: & Vec<String>) -> Vec<Tile> {
 
 
 fn first_star(matrix : Vec<String>) -> i128{
-    let vec_tile = create_tile(&matrix);
-    let matrix_dist = create_matrix_dist(&vec_tile);
-
-    let (elem_1, elem_2) = get_pair_with_max_distance(&matrix_dist);
-
-    println!("elem_1 : {:?}, elem_2 : {:?}", vec_tile[elem_1], vec_tile[elem_2]);
-    brute_force(matrix);
-
-    return size_rectangle(vec_tile[elem_1], vec_tile[elem_2]);
-}
-
-fn brute_force(matrix : Vec<String>){
-    let vec_tile = create_tile(&matrix);
-    let mut maxi = -1;
-    let mut good_1 = &vec_tile[0];
-    let mut good_2 = &vec_tile[0];
-
-    for elem in &vec_tile{
-        for elem_2 in &vec_tile{
-            let a = size_rectangle(*elem, *elem_2); 
-            if a > maxi{
-                maxi = a;
-                good_1 = elem;
-                good_2 = elem_2;
-            }
-        }
-    }
-    println!("distance max = {} sur elem_1 = {:?}, eleme_2 = {:?}", maxi, good_1, good_2);
-
+    return create_rectangle_vector(matrix).iter().next().unwrap().area;
 }
 
 fn size_rectangle(elem_1: Tile, elem_2: Tile) -> i128 {
@@ -88,42 +85,29 @@ fn second_star(matrix : Vec<String>) -> i128{
     0
 }
 
-fn get_pair_with_max_distance(matrix_dist: &Vec<Vec<i128>>) -> (usize, usize) {
-    let mut result_line = 0;
-    let mut result_column = 1;
-    let mut maxi = -1; 
-    for (line, content) in matrix_dist.iter().enumerate(){
-        for (column, dist) in content.iter().enumerate(){ // la matrice sera toujours symétrique ->
-                                                          // on peut couper en deux
-            if line.le(&column){
-                continue;
-            }
-            if *dist > maxi {
-                maxi = *dist; 
-                result_line = line;
-                result_column = column;
-            }
+// fn create_matrix_area(vec_tile: &Vec<Tile>) -> Vec<Vec<i128>> {
+//     let mut result : Vec<Vec<i128>> = Vec::new();
+//     for (i, elem_1) in vec_tile.iter().enumerate(){
+//         result.push(Vec::new());
+//         for j in i + 1..vec_tile.len(){
+//             result[i].push(size_rectangle(*elem_1, vec_tile[j]));
+//         }
+//     }
+//
+//     return result;
+//
+// }
+
+fn create_rectangle_vector(matrix : Vec<String>) -> Vec<Rectangle>{
+    let vec_tile = create_tile(&matrix);
+    let mut result : Vec<Rectangle> = Vec::new();
+    for i in 0..vec_tile.len(){
+        for j in i + 1..vec_tile.len(){
+            result.push(Rectangle{corner_1 : vec_tile[i], corner_2 : vec_tile[j], area : size_rectangle(vec_tile[i], vec_tile[j])});
         }
     }
-    println!("maxi  =  {}", maxi);
-    return (result_line, result_column);
-}
-
-fn create_matrix_dist(vec_tile: &Vec<Tile>) -> Vec<Vec<i128>> {
-    let mut result : Vec<Vec<i128>> = Vec::new();
-    for (i, elem_1) in vec_tile.iter().enumerate(){
-        result.push(Vec::new());
-        for elem_2 in vec_tile.iter(){
-            result[i].push(get_distance(elem_1, elem_2));
-        }
-    }
-
-    return result;
-
-}
-
-fn get_distance(elem_1: &Tile, elem_2: &Tile) -> i128 {
-    return (elem_1.line - elem_2.line).pow(2) + (elem_1.column - elem_2.column).pow(2);
+    result.sort();
+    result
 }
 
 fn main() {
@@ -142,3 +126,4 @@ fn main() {
     }
     println!("result = {}", result);
 }
+// input -> 1227
