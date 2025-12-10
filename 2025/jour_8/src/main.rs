@@ -88,7 +88,7 @@ fn second_star(matrix : Vec<String>) -> i128{
     return elem_1.x * elem_2.x;
 }
 
-fn merge_two_Junction(vec_junction: &mut Vec<JunctionBoxe>, matrix_dist: & mut Vec<Vec<i128>>, circuit_to_junction : &mut HashMap<i32, Vec<JunctionBoxe>>, new_circuit : & mut i32) -> (usize, usize){
+fn merge_two_junction(vec_junction: &mut Vec<JunctionBoxe>, matrix_dist: & mut Vec<Vec<i128>>, circuit_to_junction : &mut HashMap<i32, Vec<JunctionBoxe>>, new_circuit : & mut i32) -> (usize, usize){
     let (line, column) = get_pair_with_min_distance(&matrix_dist);
     // println!("on va appairer les valeures {:?} et {:?}", vec_junction[line], vec_junction[column]);
     matrix_dist[line][column] = -1; 
@@ -127,7 +127,7 @@ fn iterate_2(vec_junction: &mut Vec<JunctionBoxe>, matrix_dist: & mut Vec<Vec<i1
     let mut nb_iter = 0;
     while !finish{
         nb_iter += 1;
-        (line, column) = merge_two_Junction(vec_junction, matrix_dist, &mut circuit_to_junction, & mut new_circuit);
+        (line, column) = merge_two_junction(vec_junction, matrix_dist, &mut circuit_to_junction, & mut new_circuit);
         if line == column {
             continue;
         }
@@ -141,7 +141,7 @@ fn iterate(vec_junction: &mut Vec<JunctionBoxe>, matrix_dist: & mut Vec<Vec<i128
     let mut new_circuit = 0;
     for _i in 0..nb_iteration{
         // println!("on va appairer les valeures {:?} et {:?}", vec_junction[line], vec_junction[column]);
-        merge_two_Junction(vec_junction, matrix_dist, &mut circuit_to_junction, & mut new_circuit);
+        merge_two_junction(vec_junction, matrix_dist, &mut circuit_to_junction, & mut new_circuit);
     }
     return circuit_to_junction;
 }
