@@ -4,4 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+memoize = "0.5.1"
 ordered_vec = "0.2.0"
